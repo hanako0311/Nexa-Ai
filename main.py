@@ -8,21 +8,6 @@ from azure.cosmos import CosmosClient, PartitionKey
 import uuid
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
-
-# Access environment variables
-cosmos_uri = os.getenv("COSMOS_DB_URI")
-cosmos_key = os.getenv("COSMOS_DB_KEY")
-
-# Debugging: Check if variables are None
-if cosmos_uri is None or cosmos_key is None:
-    st.error("Cosmos DB URI or Key not found. Please check your .env file.")
-else:
-    st.success("Cosmos DB credentials loaded successfully.")
-
-
-
 # Load configuration settings
 with open("config.yml", "r") as config_file:
     config = yaml.safe_load(config_file)
@@ -33,6 +18,14 @@ st.set_page_config(page_title=config["title"], page_icon=config.get("logo", None
 # Load custom CSS
 with open(os.path.join("styles", "styles.css")) as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables
+cosmos_uri = os.getenv("COSMOS_DB_URI")
+cosmos_key = os.getenv("COSMOS_DB_KEY") 
+
 
 # Helper function to encode images to base64
 def get_base64_image(image_path):
