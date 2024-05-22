@@ -3,6 +3,7 @@ import yaml
 from llm_bot import extract_text_from_pdf, extract_text_from_docx, extract_text_from_txt, generate_response
 import os
 import base64
+from streamlit_feedback import streamlit_feedback
 
 # Load configuration settings
 with open("config.yml", "r") as config_file:
@@ -111,6 +112,14 @@ if prompt := st.chat_input("Enter your question here..."):
             </div>
             """, unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": response_text})
+
+            # Collect user feedback
+            streamlit_feedback(
+                feedback_type="faces",
+                optional_text_label="[Optional] Please provide an explanation",
+                key="feedback",
+            )
+
         except Exception as e:
             st.error(f"Error generating response: {e}")
             st.error(f"Details: {str(e)}")
