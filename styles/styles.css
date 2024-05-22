@@ -1,0 +1,99 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+body {
+  background-color: #1e1e1e;
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
+.user_message {
+  background-color: #a5ef7f;
+  color: black;
+  padding: 10px;
+  border-radius: 15px;
+  max-width: 70%;
+  display: flex;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.bot_message {
+  background-color: #f0f2f6;
+  color: black;
+  padding: 10px;
+  border-radius: 15px;
+  max-width: 70%;
+  display: flex;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.message_container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.message_container.user {
+  justify-content: flex-end;
+}
+
+.user_message {
+  order: 1;
+}
+
+.user_avatar {
+  order: 2;
+}
+
+.bot_message {
+  order: 2;
+}
+
+.bot_avatar {
+  order: 1;
+}
+
+.avatar {
+  margin: 5px;
+}
+
+.avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.loading {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.loading:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: loading-spin 1.2s linear infinite;
+}
+
+@keyframes loading-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

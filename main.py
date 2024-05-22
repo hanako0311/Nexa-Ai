@@ -1,13 +1,28 @@
 import streamlit as st
 import yaml
 from llm_bot import extract_text_from_pdf, extract_text_from_docx, extract_text_from_txt, generate_response
+import os
+import base64
 
 # Load configuration settings
 with open("config.yml", "r") as config_file:
     config = yaml.safe_load(config_file)
 
 # Set up the Streamlit app
-st.set_page_config(page_title=config["title"], page_icon=config.get("logo", None))
+st.set_page_config(page_title=config["title"], page_icon=config.get("logo", None), layout="wide")
+
+# Load custom CSS
+with open(os.path.join("styles", "styles.css")) as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Helper function to encode images to base64
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+# Encode the images
+user_img_base64 = get_base64_image("images/user.png")
+chatbot_img_base64 = get_base64_image("images/chatbot.png")
 
 # Initialize session state if not already initialized
 if "openai_model" not in st.session_state:
@@ -55,23 +70,46 @@ else:
 
 # Display chat history
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    if message["role"] == "user":
+        st.markdown(f"""
+        <div class="message_container user">
+            <div class="avatar user_avatar"><img src="data:image/png;base64,{user_img_base64}" /></div>
+            <div class="message user_message">{message["content"]}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+        <div class="message_container bot">
+            <div class="message bot_message">{message["content"]}</div>
+            <div class="avatar bot_avatar"><img src="data:image/png;base64,{chatbot_img_base64}" /></div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Handle user input
 if prompt := st.chat_input("Enter your question here..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    st.markdown(f"""
+    <div class="message_container user">
+        <div class="message user_message">{prompt}</div>
+        <div class="avatar user_avatar"><img src="data:image/png;base64,{user_img_base64}" /></div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with st.chat_message("assistant"):
+    with st.spinner("Nexa is thinking..."):
         context = st.session_state.document_text if st.session_state.document_text else ""
         try:
-            if prompt.lower() in ["hi", "hello"]:
-                response_text = "Hello! I'm Nexa, How can I assist you today?"
+            if prompt.lower() in ["hi", "hello", "hi!", "hello!", "hey", "hey!", "hi nexa", "hello nexa", "hey nexa"]:
+                response_text = "Hello! I'm Nexa, How can I assist you today? 😊"
+            elif "thank you" in prompt.lower():
+                response_text = "You're welcome! If you have any more questions, feel free to ask. 😃"
             else:
                 response_text = generate_response(prompt, context, st.session_state["openai_model"])
-            st.markdown(response_text)
+            st.markdown(f"""
+            <div class="message_container bot">
+                <div class="avatar bot_avatar"><img src="data:image/png;base64,{chatbot_img_base64}" /></div>
+                <div class="message bot_message">{response_text}</div>
+            </div>
+            """, unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": response_text})
         except Exception as e:
             st.error(f"Error generating response: {e}")

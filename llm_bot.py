@@ -1,4 +1,3 @@
-#llm_bot.py
 import os
 import logging
 from openai import AzureOpenAI
@@ -45,9 +44,11 @@ def generate_response(prompt, context="", model="gpt-35-turbo"):
 
     messages = [
         {"role": "system", "content": "You are an assistant. Use the context provided to answer questions."},
-        {"role": "system", "content": context},
         {"role": "user", "content": prompt}
     ]
+
+    if context:
+        messages.insert(1, {"role": "system", "content": context})
 
     try:
         response = client.chat.completions.create(
@@ -65,7 +66,7 @@ def generate_response(prompt, context="", model="gpt-35-turbo"):
 # Example usage
 if __name__ == "__main__":
     prompt = "Hello, how can I help you?"
-    context = "You are an assistant."
-    model = "gpt35turbo"
+    context = "This is an example context."
+    model = "gpt-35-turbo"
     response_text = generate_response(prompt, context, model)
     print(response_text)
