@@ -4,7 +4,6 @@
 ![OpenAI](https://img.shields.io/badge/OpenAI-0.11.0-brightgreen)
 ![Azure](https://img.shields.io/badge/Azure-2024--05--01--preview-blue)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![License](https://img.shields.io/github/license/yourusername/nexa-ai)
 
 ## Nexa-Ai: AI Chatbot with PDF Reading and Image Generation
 
