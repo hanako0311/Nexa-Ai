@@ -3,30 +3,15 @@ import yaml
 from llm_bot import extract_text_from_pdf, extract_text_from_docx, extract_text_from_txt, generate_response
 import os
 import base64
-from streamlit_feedback import streamlit_feedback
-from azure.cosmos import CosmosClient, PartitionKey
 import uuid
 from dotenv import load_dotenv
-
-# Set up the Streamlit app (this must be the first Streamlit command)
-st.set_page_config(page_title="Nexa-AI", page_icon=None, layout="wide")
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Access environment variables
-cosmos_uri = os.getenv("COSMOS_DB_URI")
-cosmos_key = os.getenv("COSMOS_DB_KEY")
-
-# Debugging: Check if variables are None
-if cosmos_uri is None or cosmos_key is None:
-    st.error("Cosmos DB URI or Key not found. Please check your .env file.")
-else:
-    st.success("Cosmos DB credentials loaded successfully.")
 
 # Load configuration settings
 with open("config.yml", "r") as config_file:
     config = yaml.safe_load(config_file)
+
+# Set up the Streamlit app
+st.set_page_config(page_title=config["title"], page_icon=config.get("logo", None), layout="wide")
 
 # Load custom CSS
 with open(os.path.join("styles", "styles.css")) as f:
@@ -102,17 +87,6 @@ for message in st.session_state.messages:
         </div>
         """, unsafe_allow_html=True)
 
-# Initialize Cosmos DB client
-client = CosmosClient(cosmos_uri, cosmos_key)
-database_name = 'FeedbackDatabase'
-container_name = 'FeedbackContainer'
-database = client.create_database_if_not_exists(id=database_name)
-container = database.create_container_if_not_exists(
-    id=container_name,
-    partition_key=PartitionKey(path="/feedbackId"),
-    offer_throughput=400
-)
-
 # Handle user input
 if prompt := st.chat_input("Enter your question here..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -139,24 +113,7 @@ if prompt := st.chat_input("Enter your question here..."):
             </div>
             """, unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": response_text})
-
-            # Collect user feedback
-            feedback = streamlit_feedback(
-                feedback_type="faces",
-                optional_text_label="[Optional] Please provide an explanation",
-                key="feedback",
-            )
-
-            # Save feedback to Cosmos DB
-            feedback_data = {
-                "feedbackId": str(uuid.uuid4()),
-                "prompt": prompt,
-                "response": response_text,
-                "score": feedback['score'],
-                "explanation": feedback['text']
-            }
-            container.create_item(body=feedback_data)
-
+            
         except Exception as e:
             st.error(f"Error generating response: {e}")
             st.error(f"Details: {str(e)}")
