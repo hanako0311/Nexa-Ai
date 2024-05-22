@@ -15,6 +15,13 @@ load_dotenv()
 cosmos_uri = os.getenv("COSMOS_DB_URI")
 cosmos_key = os.getenv("COSMOS_DB_KEY")
 
+# Debugging: Check if variables are None
+if cosmos_uri is None or cosmos_key is None:
+    st.error("Cosmos DB URI or Key not found. Please check your .env file.")
+else:
+    st.success("Cosmos DB credentials loaded successfully.")
+
+
 
 # Load configuration settings
 with open("config.yml", "r") as config_file:
