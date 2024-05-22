@@ -4,6 +4,17 @@ from llm_bot import extract_text_from_pdf, extract_text_from_docx, extract_text_
 import os
 import base64
 from streamlit_feedback import streamlit_feedback
+from azure.cosmos import CosmosClient, PartitionKey
+import uuid
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables
+cosmos_uri = os.getenv("COSMOS_DB_URI")
+cosmos_key = os.getenv("COSMOS_DB_KEY")
+
 
 # Load configuration settings
 with open("config.yml", "r") as config_file:
@@ -86,6 +97,18 @@ for message in st.session_state.messages:
         </div>
         """, unsafe_allow_html=True)
 
+# Initialize Cosmos DB client
+client = CosmosClient(cosmos_uri, cosmos_key)
+database_name = 'FeedbackDatabase'
+container_name = 'FeedbackContainer'
+database = client.create_database_if_not_exists(id=database_name)
+container = database.create_container_if_not_exists(
+    id=container_name,
+    partition_key=PartitionKey(path="/feedbackId"),
+    offer_throughput=400
+)
+
+
 # Handle user input
 if prompt := st.chat_input("Enter your question here..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -114,11 +137,21 @@ if prompt := st.chat_input("Enter your question here..."):
             st.session_state.messages.append({"role": "assistant", "content": response_text})
 
             # Collect user feedback
-            streamlit_feedback(
+            feedback = streamlit_feedback(
                 feedback_type="faces",
                 optional_text_label="[Optional] Please provide an explanation",
                 key="feedback",
             )
+
+            # Save feedback to Cosmos DB
+            feedback_data = {
+                "feedbackId": str(uuid.uuid4()),
+                "prompt": prompt,
+                "response": response_text,
+                "score": feedback['score'],
+                "explanation": feedback['text']
+            }
+            container.create_item(body=feedback_data)
 
         except Exception as e:
             st.error(f"Error generating response: {e}")
