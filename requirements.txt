@@ -5,3 +5,4 @@ docx2txt
 openai
 python-dotenv
 streamlit-feedback
+azure-cosmos
