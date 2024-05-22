@@ -1,2 +1,22 @@
-/.env
-/myenv
+# Ignore virtual environment folders
+venv/
+myenv/
+
+# Ignore environment variable files
+.env
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore Streamlit temporary files
+.streamlit/
+
+# Ignore any logs or local settings
+*.log
