@@ -8,24 +8,29 @@ from azure.cosmos import CosmosClient, PartitionKey
 import uuid
 from dotenv import load_dotenv
 
-# Load configuration settings
-with open("config.yml", "r") as config_file:
-    config = yaml.safe_load(config_file)
-
-# Set up the Streamlit app
-st.set_page_config(page_title=config["title"], page_icon=config.get("logo", None), layout="wide")
-
-# Load custom CSS
-with open(os.path.join("styles", "styles.css")) as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# Set up the Streamlit app (this must be the first Streamlit command)
+st.set_page_config(page_title="Nexa-AI", page_icon=None, layout="wide")
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Access environment variables
 cosmos_uri = os.getenv("COSMOS_DB_URI")
-cosmos_key = os.getenv("COSMOS_DB_KEY") 
+cosmos_key = os.getenv("COSMOS_DB_KEY")
 
+# Debugging: Check if variables are None
+if cosmos_uri is None or cosmos_key is None:
+    st.error("Cosmos DB URI or Key not found. Please check your .env file.")
+else:
+    st.success("Cosmos DB credentials loaded successfully.")
+
+# Load configuration settings
+with open("config.yml", "r") as config_file:
+    config = yaml.safe_load(config_file)
+
+# Load custom CSS
+with open(os.path.join("styles", "styles.css")) as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Helper function to encode images to base64
 def get_base64_image(image_path):
@@ -107,7 +112,6 @@ container = database.create_container_if_not_exists(
     partition_key=PartitionKey(path="/feedbackId"),
     offer_throughput=400
 )
-
 
 # Handle user input
 if prompt := st.chat_input("Enter your question here..."):

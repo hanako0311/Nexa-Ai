@@ -58,7 +58,12 @@ def generate_response(prompt, context="", model="gpt-35-turbo"):
             temperature=0.9
         )
         logging.info(f"Response received: {response}")
-        return response.choices[0].message.content.strip()
+        # Check if the response is valid
+        if response and response.choices and response.choices[0].message and response.choices[0].message.content:
+            return response.choices[0].message.content.strip()
+        else:
+            logging.error(f"Invalid response structure: {response}")
+            return "I'm sorry, I couldn't generate a response."
     except Exception as e:
         logging.error(f"Error generating response: {e}")
         raise
