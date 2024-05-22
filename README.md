@@ -41,20 +41,23 @@ Nexa-Ai is an AI chatbot powered by Azure OpenAI services, capable of reading PD
 
 3. **Install Dependencies**
 
-```bash
+   ```bash
    pip install -r requirements.txt
-```
+
+   ```
 
 4. **Set Up Environment Variables**
 
-```bash
+   ```bash
    AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
    AZURE_OPENAI_ENDPOINT=https://your_openai_resource_name.openai.azure.com/
    AZURE_OPENAI_API_VERSION=2024-05-01-preview
-```
+
+   ```
 
 5. **Run the Streamlit App**
 
-```bash
-streamlit run main.py
-```
+   ```bash
+   streamlit run main.py
+
+   ```
